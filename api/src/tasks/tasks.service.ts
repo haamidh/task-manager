@@ -2,14 +2,26 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Task } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
+import { ListTasksQueryDto } from './dto/list-tasks-query.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): Promise<Task[]> {
-    return this.prisma.task.findMany({ orderBy: { createdAt: 'desc' } });
+  findAll(query: ListTasksQueryDto = {}): Promise<Task[]> {
+    const { status, sort = 'createdAt' } = query;
+    // Newest first by default; soonest due date first when sorting by it.
+    const order = query.order ?? (sort === 'dueDate' ? 'asc' : 'desc');
+
+    return this.prisma.task.findMany({
+      where: { status },
+      orderBy:
+        sort === 'dueDate'
+          ? // Tasks without a due date always go to the end of the list.
+            [{ dueDate: { sort: order, nulls: 'last' } }, { createdAt: 'desc' }]
+          : { createdAt: order },
+    });
   }
 
   async findOne(id: string): Promise<Task> {
