@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { STATUS_LABELS } from "@/components/tasks/task-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,9 +95,22 @@ function TaskForm({ task, onDone }: { task?: Task; onDone: () => void }) {
     };
 
     if (task) {
-      updateTask.mutate({ id: task.id, input }, { onSuccess: onDone });
+      updateTask.mutate(
+        { id: task.id, input },
+        {
+          onSuccess: () => {
+            toast.success("Task updated");
+            onDone();
+          },
+        },
+      );
     } else {
-      createTask.mutate(input, { onSuccess: onDone });
+      createTask.mutate(input, {
+        onSuccess: () => {
+          toast.success("Task created");
+          onDone();
+        },
+      });
     }
   }
 

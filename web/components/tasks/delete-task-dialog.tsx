@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -76,7 +77,14 @@ function DeleteTaskConfirmation({
         <AlertDialogAction
           variant="destructive"
           disabled={deleteTask.isPending}
-          onClick={() => deleteTask.mutate(task.id, { onSuccess: onDone })}
+          onClick={() =>
+            deleteTask.mutate(task.id, {
+              onSuccess: () => {
+                toast.success("Task deleted");
+                onDone();
+              },
+            })
+          }
         >
           {deleteTask.isPending ? "Deleting..." : "Delete"}
         </AlertDialogAction>

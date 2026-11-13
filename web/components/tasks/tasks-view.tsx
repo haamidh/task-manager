@@ -1,16 +1,22 @@
 "use client";
 
-import { PlusIcon } from "lucide-react";
+import { CircleAlertIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { DeleteTaskDialog } from "@/components/tasks/delete-task-dialog";
 import { TaskFormDialog } from "@/components/tasks/task-form-dialog";
 import { TasksTable } from "@/components/tasks/tasks-table";
+import {
+  Alert,
+  AlertAction,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/use-tasks";
 import type { Task } from "@/lib/types";
 
 export function TasksView() {
-  const { data: tasks, isPending, error } = useTasks();
+  const { data: tasks, isPending, isFetching, error, refetch } = useTasks();
 
   // One dialog serves both cases: `editingTask` is set when editing and
   // undefined when creating.
@@ -50,11 +56,26 @@ export function TasksView() {
         </Button>
       </div>
 
-      {isPending && <p className="text-muted-foreground">Loading tasks...</p>}
-      {error && <p className="text-destructive">{error.message}</p>}
-      {tasks && (
+      {error ? (
+        <Alert variant="destructive">
+          <CircleAlertIcon />
+          <AlertTitle>Could not load tasks</AlertTitle>
+          <AlertDescription>{error.message}</AlertDescription>
+          <AlertAction>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isFetching}
+              onClick={() => refetch()}
+            >
+              {isFetching ? "Retrying..." : "Retry"}
+            </Button>
+          </AlertAction>
+        </Alert>
+      ) : (
         <TasksTable
-          tasks={tasks}
+          tasks={tasks ?? []}
+          isLoading={isPending}
           onEdit={openEditForm}
           onDelete={openDeleteConfirmation}
         />

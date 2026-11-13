@@ -1,6 +1,7 @@
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { TaskStatusBadge } from "@/components/tasks/task-status-badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -13,14 +14,22 @@ import { formatDueDate, formatTimestamp } from "@/lib/format";
 import type { Task } from "@/lib/types";
 
 const COLUMN_COUNT = 5;
+const SKELETON_ROW_COUNT = 4;
 
 interface TasksTableProps {
   tasks: Task[];
+  /** True while the first request is in flight; shows placeholder rows. */
+  isLoading: boolean;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
 }
 
-export function TasksTable({ tasks, onEdit, onDelete }: TasksTableProps) {
+export function TasksTable({
+  tasks,
+  isLoading,
+  onEdit,
+  onDelete,
+}: TasksTableProps) {
   return (
     <div className="rounded-lg border">
       <Table>
@@ -36,13 +45,15 @@ export function TasksTable({ tasks, onEdit, onDelete }: TasksTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.length === 0 ? (
+          {isLoading ? (
+            <SkeletonRows />
+          ) : tasks.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={COLUMN_COUNT}
                 className="h-24 text-center text-muted-foreground"
               >
-                No tasks yet
+                No tasks yet. Create your first one with &ldquo;New task&rdquo;.
               </TableCell>
             </TableRow>
           ) : (
@@ -97,4 +108,26 @@ export function TasksTable({ tasks, onEdit, onDelete }: TasksTableProps) {
       </Table>
     </div>
   );
+}
+
+function SkeletonRows() {
+  return Array.from({ length: SKELETON_ROW_COUNT }, (_, row) => (
+    <TableRow key={row}>
+      <TableCell>
+        <Skeleton className="h-4 w-48" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-4 w-24" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-4 w-24" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="ml-auto h-7 w-16" />
+      </TableCell>
+    </TableRow>
+  ));
 }
