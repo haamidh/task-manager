@@ -1,0 +1,26 @@
+# Runs the API and the web app together:  docker compose up --build
+# Web: http://localhost:3000   API: http://localhost:3001
+
+services:
+  api:
+    build: ./api
+    ports:
+      - "3001:3001"
+    environment:
+      CORS_ORIGIN: http://localhost:3000
+    volumes:
+      - api-data:/data
+
+  web:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  # Holds the SQLite database file so tasks persist between runs.
+  api-data:
