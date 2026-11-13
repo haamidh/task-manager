@@ -1,6 +1,11 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { tasksApi } from "@/lib/api";
 import type {
   CreateTaskInput,
@@ -16,6 +21,9 @@ export function useTasks(filters: TaskFilters = {}) {
   return useQuery({
     queryKey: [...TASKS_KEY, filters],
     queryFn: () => tasksApi.list(filters),
+    // Keep showing the current rows while a new filter or sort loads,
+    // instead of flashing back to the loading skeleton.
+    placeholderData: keepPreviousData,
   });
 }
 

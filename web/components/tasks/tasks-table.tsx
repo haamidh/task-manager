@@ -20,6 +20,8 @@ interface TasksTableProps {
   tasks: Task[];
   /** True while the first request is in flight; shows placeholder rows. */
   isLoading: boolean;
+  /** Shown in place of the rows when there are no tasks to list. */
+  emptyMessage: string;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
 }
@@ -27,6 +29,7 @@ interface TasksTableProps {
 export function TasksTable({
   tasks,
   isLoading,
+  emptyMessage,
   onEdit,
   onDelete,
 }: TasksTableProps) {
@@ -53,7 +56,7 @@ export function TasksTable({
                 colSpan={COLUMN_COUNT}
                 className="h-24 text-center text-muted-foreground"
               >
-                No tasks yet. Create your first one with &ldquo;New task&rdquo;.
+                {emptyMessage}
               </TableCell>
             </TableRow>
           ) : (

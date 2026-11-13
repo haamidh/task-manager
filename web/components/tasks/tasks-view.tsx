@@ -6,6 +6,12 @@ import { DeleteTaskDialog } from "@/components/tasks/delete-task-dialog";
 import { TaskFormDialog } from "@/components/tasks/task-form-dialog";
 import { TasksTable } from "@/components/tasks/tasks-table";
 import {
+  SORT_OPTIONS,
+  TasksToolbar,
+  type SortOption,
+  type StatusFilter,
+} from "@/components/tasks/tasks-toolbar";
+import {
   Alert,
   AlertAction,
   AlertDescription,
@@ -16,7 +22,21 @@ import { useTasks } from "@/hooks/use-tasks";
 import type { Task } from "@/lib/types";
 
 export function TasksView() {
-  const { data: tasks, isPending, isFetching, error, refetch } = useTasks();
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [sort, setSort] = useState<SortOption>("newest");
+
+  // Filtering and sorting happen in the API, so the choices are sent as
+  // query params and the list is refetched when they change.
+  const {
+    data: tasks,
+    isPending,
+    isFetching,
+    error,
+    refetch,
+  } = useTasks({
+    status: statusFilter === "ALL" ? undefined : statusFilter,
+    ...SORT_OPTIONS[sort].params,
+  });
 
   // One dialog serves both cases: `editingTask` is set when editing and
   // undefined when creating.
@@ -56,6 +76,13 @@ export function TasksView() {
         </Button>
       </div>
 
+      <TasksToolbar
+        status={statusFilter}
+        onStatusChange={setStatusFilter}
+        sort={sort}
+        onSortChange={setSort}
+      />
+
       {error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />
@@ -76,6 +103,11 @@ export function TasksView() {
         <TasksTable
           tasks={tasks ?? []}
           isLoading={isPending}
+          emptyMessage={
+            statusFilter === "ALL"
+              ? "No tasks yet. Create your first one with “New task”."
+              : "No tasks with this status."
+          }
           onEdit={openEditForm}
           onDelete={openDeleteConfirmation}
         />
