@@ -1,4 +1,6 @@
+import { PencilIcon } from "lucide-react";
 import { TaskStatusBadge } from "@/components/tasks/task-status-badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,9 +12,14 @@ import {
 import { formatDueDate, formatTimestamp } from "@/lib/format";
 import type { Task } from "@/lib/types";
 
-const COLUMN_COUNT = 4;
+const COLUMN_COUNT = 5;
 
-export function TasksTable({ tasks }: { tasks: Task[] }) {
+interface TasksTableProps {
+  tasks: Task[];
+  onEdit: (task: Task) => void;
+}
+
+export function TasksTable({ tasks, onEdit }: TasksTableProps) {
   return (
     <div className="rounded-lg border">
       <Table>
@@ -22,6 +29,9 @@ export function TasksTable({ tasks }: { tasks: Task[] }) {
             <TableHead>Status</TableHead>
             <TableHead>Due date</TableHead>
             <TableHead>Created</TableHead>
+            <TableHead className="w-0">
+              <span className="sr-only">Actions</span>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -57,6 +67,16 @@ export function TasksTable({ tasks }: { tasks: Task[] }) {
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatTimestamp(task.createdAt)}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={`Edit "${task.title}"`}
+                    onClick={() => onEdit(task)}
+                  >
+                    <PencilIcon />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
