@@ -1,4 +1,4 @@
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import { TaskStatusBadge } from "@/components/tasks/task-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,9 +17,10 @@ const COLUMN_COUNT = 5;
 interface TasksTableProps {
   tasks: Task[];
   onEdit: (task: Task) => void;
+  onDelete: (task: Task) => void;
 }
 
-export function TasksTable({ tasks, onEdit }: TasksTableProps) {
+export function TasksTable({ tasks, onEdit, onDelete }: TasksTableProps) {
   return (
     <div className="rounded-lg border">
       <Table>
@@ -69,14 +70,25 @@ export function TasksTable({ tasks, onEdit }: TasksTableProps) {
                   {formatTimestamp(task.createdAt)}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Edit "${task.title}"`}
-                    onClick={() => onEdit(task)}
-                  >
-                    <PencilIcon />
-                  </Button>
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={`Edit "${task.title}"`}
+                      onClick={() => onEdit(task)}
+                    >
+                      <PencilIcon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      aria-label={`Delete "${task.title}"`}
+                      onClick={() => onDelete(task)}
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))

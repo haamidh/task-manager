@@ -2,6 +2,7 @@
 
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+import { DeleteTaskDialog } from "@/components/tasks/delete-task-dialog";
 import { TaskFormDialog } from "@/components/tasks/task-form-dialog";
 import { TasksTable } from "@/components/tasks/tasks-table";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,9 @@ export function TasksView() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>();
 
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletingTask, setDeletingTask] = useState<Task | undefined>();
+
   function openCreateForm() {
     setEditingTask(undefined);
     setFormOpen(true);
@@ -24,6 +28,11 @@ export function TasksView() {
   function openEditForm(task: Task) {
     setEditingTask(task);
     setFormOpen(true);
+  }
+
+  function openDeleteConfirmation(task: Task) {
+    setDeletingTask(task);
+    setDeleteOpen(true);
   }
 
   return (
@@ -43,12 +52,23 @@ export function TasksView() {
 
       {isPending && <p className="text-muted-foreground">Loading tasks...</p>}
       {error && <p className="text-destructive">{error.message}</p>}
-      {tasks && <TasksTable tasks={tasks} onEdit={openEditForm} />}
+      {tasks && (
+        <TasksTable
+          tasks={tasks}
+          onEdit={openEditForm}
+          onDelete={openDeleteConfirmation}
+        />
+      )}
 
       <TaskFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
         task={editingTask}
+      />
+      <DeleteTaskDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        task={deletingTask}
       />
     </section>
   );
